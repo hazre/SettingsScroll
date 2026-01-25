@@ -14,6 +14,7 @@ containsNsfwContent = false
 # List any dependencies your mod has here, in the format "namespace-modname" = "version-constraint"
 [package.dependencies]
 ResoniteModding-BepisLoader = "1.6.0"
+ResoniteModding-BepisLocaleLoader = "1.2.0"
 MonoDetour-MonoDetour_BepInEx_6 = "0.7.10"
 
 [build]
@@ -30,6 +31,11 @@ target = "plugins/SettingsScroll/"
 [[build.copy]]
 source = "./SettingsScroll/bin/Release/SettingsScroll.pdb"
 target = "plugins/SettingsScroll/"
+
+# Include locale files
+[[build.copy]]
+source = "./SettingsScroll/Locale"
+target = "plugins/SettingsScroll/Locale"
 
 # Uncomment the following lines to include CHANGELOG file in your mod package. https://wiki.thunderstore.io/mods/updating-a-package#changelog
 # [[build.copy]]

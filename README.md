@@ -10,6 +10,14 @@ A [Resonite](https://resonite.com/) mod that makes settings page scrollable. Fix
    - **Default location:** `C:\Program Files (x86)\Steam\steamapps\common\Resonite\BepInEx\`
 4. Start the game. If you want to verify that the mod is working you can check your BepInEx logs.
 
+## Configuration
+
+The mod can be configured via `BepInEx/config/dev.hazre.settingsscroll.cfg`:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `Enabled` | `true` | Enables the settings scroll fix. Requires a restart to take effect. |
+
 ## Acknowledgments
 
 This mod's scroll fix logic is derived from [MonkeyLoader.GamePacks.Resonite](https://github.com/ResoniteModdingGroup/MonkeyLoader.GamePacks.Resonite). See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for details.

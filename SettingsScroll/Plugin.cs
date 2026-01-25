@@ -4,8 +4,10 @@
 // License: LGPL-3.0 - See THIRD-PARTY-NOTICES.md for details
 
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.NET.Common;
+using BepisLocaleLoader;
 using Elements.Core;
 using FrooxEngine;
 using FrooxEngine.FrooxEngine.ProtoFlux.CoreNodes;
@@ -21,10 +23,12 @@ namespace SettingsScroll;
 public partial class Plugin : BasePlugin
 {
     internal static new ManualLogSource Log = null!;
+    internal static ConfigEntry<bool> Enabled = null!;
 
     public override void Load()
     {
         Log = base.Log;
+        Enabled = Config.BindLocalized(GUID, "General", "Enabled", true, "Enable the settings scroll fix. Requires a restart to take effect.");
         MonoDetourManager.InvokeHookInitializers(typeof(Plugin).Assembly);
         Log.LogInfo($"Plugin {GUID} loaded");
     }
@@ -38,25 +42,10 @@ internal static class FacetPresetHooks
 
     static void Prefix_OnLoading(FacetPreset self, ref DataTreeNode _node, ref LoadControl control)
     {
-        if (self is not SettingsFacetPreset settingsPreset)
+        if (!Plugin.Enabled.Value || self is not SettingsFacetPreset settingsPreset)
             return;
 
-        control.OnLoaded(self, () =>
-        {
-            try
-            {
-                var facetSlot = settingsPreset.Facet?.Slot;
-                var canvas = facetSlot?.GetComponentInChildren<Canvas>();
-                if (facetSlot == null || canvas == null)
-                    return;
-
-                SettingsScrollFix.ApplyScrollFix(facetSlot, canvas.Slot);
-            }
-            catch (Exception ex)
-            {
-                Plugin.Log.LogError($"Failed to apply scroll fix: {ex}");
-            }
-        }, int.MaxValue);
+        control.OnLoaded(self, () => SettingsScrollFix.TryApplyScrollFix(settingsPreset), int.MaxValue);
     }
 }
 
@@ -65,7 +54,24 @@ internal static class SettingsScrollFix
     // Same marker as MonkeyLoader.Resonite.Integration for cross-mod compatibility
     private const string FixedMarker = "Category Scrolling Fixed";
 
-    public static void ApplyScrollFix(Slot facetSlot, Slot canvasSlot)
+    public static void TryApplyScrollFix(SettingsFacetPreset preset)
+    {
+        try
+        {
+            var facetSlot = preset.Facet?.Slot;
+            var canvas = facetSlot?.GetComponentInChildren<Canvas>();
+            if (facetSlot == null || canvas == null)
+                return;
+
+            ApplyScrollFix(facetSlot, canvas.Slot);
+        }
+        catch (Exception ex)
+        {
+            Plugin.Log.LogError($"Failed to apply scroll fix: {ex}");
+        }
+    }
+
+    static void ApplyScrollFix(Slot facetSlot, Slot canvasSlot)
     {
         if (facetSlot.GetComponent<Comment>(c => c.Text.Value == FixedMarker) != null)
             return;
