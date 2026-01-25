@@ -1,0 +1,68 @@
+name: Create Release PR
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  prepare-release:
+    if: "!contains(github.event.head_commit.message, 'chore: prepare release')"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config user.email "github-actions@github.com"
+
+      - uses: knope-dev/action@407e9ef7c272d2dd53a4e71e39a7839e29933c48 # v2.1.0
+        with:
+          version: 0.22.1
+
+      - name: Prepare Release
+        id: knope
+        run: |
+          if knope prepare-release --verbose; then
+            echo "released=true" >> $GITHUB_OUTPUT
+          else
+            echo "released=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      released: ${{ steps.knope.outputs.released }}
+
+  build-preview:
+    needs: prepare-release
+    if: needs.prepare-release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          ref: release
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: ./.github/actions/dotnet-build
+        id: setup
+        with:
+          build: "true"
+
+      - name: Upload Preview Artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: SettingsScroll-${{ steps.setup.outputs.version }}-preview
+          path: |
+            ./bin/Release/*.dll
+            ./build/*.zip
