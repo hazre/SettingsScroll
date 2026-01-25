@@ -1,3 +1,8 @@
+// Scroll fix logic derived from MonkeyLoader.GamePacks.Resonite
+// https://github.com/ResoniteModdingGroup/MonkeyLoader.GamePacks.Resonite
+// Original: MonkeyLoader.Resonite.Integration/UI/Facets/SettingsFacetCategoryScrollingFix.cs
+// License: LGPL-3.0 - See THIRD-PARTY-NOTICES.md for details
+
 using BepInEx;
 using BepInEx.Logging;
 using BepInEx.NET.Common;
