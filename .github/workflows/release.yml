@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  release:
+    if: github.head_ref == 'release' && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: ./.github/actions/dotnet-build
+        with:
+          build: "true"
+
+      - uses: knope-dev/action@354f96399455dbd5bf44ad3ad08b5ebe7c9b0953 # v2.1.0
+        with:
+          version: 0.22.1
+
+      - name: Create Release
+        run: knope release --verbose
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to Thunderstore
+        shell: nu {0}
+        run: |
+          let zip_file = ls ./build/*.zip | get name.0
+          dotnet tcli publish --file $zip_file
+        env:
+          TCLI_AUTH_TOKEN: ${{ secrets.TCLI_AUTH_TOKEN }}
