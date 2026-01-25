@@ -1,0 +1,10 @@
+{
+  "localeCode": "en",
+  "authors": ["hazre"],
+  "messages": {
+    "Settings.dev.hazre.settingsscroll": "Settings Scroll",
+    "Settings.dev.hazre.settingsscroll.Breadcrumb": "Settings Scroll",
+    "Settings.dev.hazre.settingsscroll.General.Enabled": "Enabled",
+    "Settings.dev.hazre.settingsscroll.General.Enabled.Description": "Enables the settings scroll fix, requires a restart to take effect"
+  }
+}

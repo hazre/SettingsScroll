@@ -1,0 +1,10 @@
+{
+  "localeCode": "de",
+  "authors": ["hazre"],
+  "messages": {
+    "Settings.dev.hazre.settingsscroll": "Settings Scroll",
+    "Settings.dev.hazre.settingsscroll.Breadcrumb": "Settings Scroll",
+    "Settings.dev.hazre.settingsscroll.General.Enabled": "Aktiviert",
+    "Settings.dev.hazre.settingsscroll.General.Enabled.Description": "Aktiviert den Settings-Scroll-Fix, erfordert einen Neustart"
+  }
+}

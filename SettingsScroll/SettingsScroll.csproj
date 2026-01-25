@@ -23,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="BepInEx.AutoPlugin" Version="2.1.0" PrivateAssets="all" />
     <PackageReference Include="ResoniteModding.BepInExResoniteShim" Version="0.9.*" />
+    <PackageReference Include="ResoniteModding.BepisLocaleLoader" Version="1.*" />
     <PackageReference Include="MonoDetour.HookGen" Version="0.7.*" PrivateAssets="all" />
     <PackageReference Include="MonoDetour" Version="[*,2.0)" />
     <PackageReference Include="Krafs.Publicizer" Version="2.3.0" PrivateAssets="all" />
@@ -34,6 +35,10 @@
 
   <ItemGroup>
     <Publicize Include="FrooxEngine" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Locale\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup Condition="Exists('$(GamePath)')">
