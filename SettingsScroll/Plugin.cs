@@ -38,11 +38,12 @@ internal static class FacetPresetPatches
         {
             try
             {
-                var canvas = settingsPreset.Facet?.Slot?.GetComponentInChildren<Canvas>();
-                if (canvas == null)
+                var facetSlot = settingsPreset.Facet?.Slot;
+                var canvas = facetSlot?.GetComponentInChildren<Canvas>();
+                if (facetSlot == null || canvas == null)
                     return;
 
-                SettingsScrollFix.ApplyScrollFix(canvas.Slot);
+                SettingsScrollFix.ApplyScrollFix(facetSlot, canvas.Slot);
             }
             catch (Exception ex)
             {
@@ -54,11 +55,12 @@ internal static class FacetPresetPatches
 
 internal static class SettingsScrollFix
 {
-    private const string FixedMarker = "SettingsScroll Fix Applied";
+    // Same marker as MonkeyLoader.Resonite.Integration for cross-mod compatibility
+    private const string FixedMarker = "Category Scrolling Fixed";
 
-    public static void ApplyScrollFix(Slot canvasSlot)
+    public static void ApplyScrollFix(Slot facetSlot, Slot canvasSlot)
     {
-        if (canvasSlot.GetComponentInChildren<Comment>(c => c.Text.Value == FixedMarker) != null)
+        if (facetSlot.GetComponent<Comment>(c => c.Text.Value == FixedMarker) != null)
             return;
 
         var rootCategoryView = canvasSlot.GetComponentInChildren<RootCategoryView>();
@@ -80,7 +82,6 @@ internal static class SettingsScrollFix
         mask.Enabled = true;
         image.Enabled = true;
         overlappingLayout.Enabled = false;
-
         var layoutElement = scrollAreaSlot.AttachComponent<LayoutElement>();
 
         // Configure scroll rect
@@ -116,7 +117,7 @@ internal static class SettingsScrollFix
         rootCategoryView.CategoryManager.ContainerRoot.Target = verticalLayoutSlot;
 
         // Mark as fixed to prevent reapplication
-        canvasSlot.AttachComponent<Comment>().Text.Value = FixedMarker;
+        facetSlot.AttachComponent<Comment>().Text.Value = FixedMarker;
 
         Plugin.Log.LogInfo("Settings scroll fix applied");
     }
