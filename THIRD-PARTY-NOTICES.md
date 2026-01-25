@@ -10,6 +10,6 @@ Licensed under LGPL-3.0.
 
 The core UIX fix logic is the same - I just ported it to work with BepisLoader instead of MonkeyLoader:
 
-- Swapped MonkeyLoader's event system for a Harmony patch on `FacetPreset.OnLoading`
+- Swapped MonkeyLoader's event system for a MonoDetour patch on `FacetPreset.OnLoading`
 - Removed the `TemplateFacetPresetFallbackBuiltEvent` check since it doesn't apply here
 - Kept the same marker text so both mods can coexist without applying the fix twice

@@ -11,7 +11,8 @@ using FrooxEngine;
 using FrooxEngine.FrooxEngine.ProtoFlux.CoreNodes;
 using FrooxEngine.ProtoFlux.Runtimes.Execution.Nodes.Operators;
 using FrooxEngine.UIX;
-using HarmonyLib;
+using MonoDetour;
+using MonoDetour.HookGen;
 
 namespace SettingsScroll;
 
@@ -24,22 +25,23 @@ public partial class Plugin : BasePlugin
     public override void Load()
     {
         Log = base.Log;
-
-        HarmonyInstance.PatchAll();
+        MonoDetourManager.InvokeHookInitializers(typeof(Plugin).Assembly);
         Log.LogInfo($"Plugin {GUID} loaded");
     }
 }
 
-[HarmonyPatch(typeof(FacetPreset), "OnLoading")]
-internal static class FacetPresetPatches
+[MonoDetourTargets(typeof(FacetPreset))]
+internal static class FacetPresetHooks
 {
-    [HarmonyPrefix]
-    private static void OnLoadingPrefix(FacetPreset __instance, LoadControl control)
+    [MonoDetourHookInitialize]
+    static void Init() => Md.FrooxEngine.FacetPreset.OnLoading.Prefix(Prefix_OnLoading);
+
+    static void Prefix_OnLoading(FacetPreset self, ref DataTreeNode _node, ref LoadControl control)
     {
-        if (__instance is not SettingsFacetPreset settingsPreset)
+        if (self is not SettingsFacetPreset settingsPreset)
             return;
 
-        control.OnLoaded(__instance, () =>
+        control.OnLoaded(self, () =>
         {
             try
             {
