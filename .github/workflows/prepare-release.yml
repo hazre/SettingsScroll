@@ -24,18 +24,31 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config user.email "github-actions@github.com"
 
+      - uses: ./.github/actions/collect-build-info
+        id: info
+
       - uses: knope-dev/action@407e9ef7c272d2dd53a4e71e39a7839e29933c48 # v2.1.0
         with:
           version: 0.22.1
 
       - name: Prepare Release
         id: knope
+        shell: nu {0}
         run: |
-          if knope prepare-release --verbose; then
-            echo "released=true" >> $GITHUB_OUTPUT
-          else
-            echo "released=false" >> $GITHUB_OUTPUT
-          fi
+          let version = "${{ steps.info.outputs.version }}"
+          let has_tag = (git tag -l "v1.0.0" | str trim) == "v1.0.0"
+          let needs_override = $version == "1.0.0" and not $has_tag
+
+          let result = if $needs_override {
+            do -i { knope prepare-release --verbose --override-version 1.0.0 } | complete
+          } else {
+            do -i { knope prepare-release --verbose } | complete
+          }
+          if $result.exit_code == 0 {
+            "released=true\n" | save -a --raw $env.GITHUB_OUTPUT
+          } else {
+            "released=false\n" | save -a --raw $env.GITHUB_OUTPUT
+          }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     outputs:
@@ -47,6 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -60,9 +74,21 @@ jobs:
           build: "true"
 
       - name: Upload Preview Artifacts
+        id: upload
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: SettingsScroll-${{ steps.setup.outputs.version }}-preview
-          path: |
-            ./bin/Release/*.dll
-            ./build/*.zip
+          path: ./build/*.zip
+
+      - name: Update PR Body
+        shell: nu {0}
+        run: |
+          let current_body = gh pr view release --json body -q '.body'
+          let new_body = $"($current_body)
+
+          ## Preview Build
+
+          [Download SettingsScroll-${{ steps.setup.outputs.version }}-preview.zip]\(${{ steps.upload.outputs.artifact-url }})"
+          gh pr edit release --body $new_body
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
