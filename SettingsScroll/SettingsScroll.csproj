@@ -56,4 +56,7 @@
     <Message Text="Copied plugin files to $(PluginTargetDir)" Importance="high" />
   </Target>
 
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
 </Project>
