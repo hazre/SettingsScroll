@@ -30,7 +30,7 @@ jobs:
         with:
           subject-path: './build/*.zip'
 
-      - uses: knope-dev/action@354f96399455dbd5bf44ad3ad08b5ebe7c9b0953 # v2.1.0
+      - uses: knope-dev/action@407e9ef7c272d2dd53a4e71e39a7839e29933c48 # v2.1.0
         with:
           version: 0.22.1
 
