@@ -19,10 +19,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
-      - name: Configure Git
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config user.email "github-actions@github.com"
+      - uses: fregante/setup-git-user@024bc0b8e177d7e77203b48dab6fb45666854b35 # v2.0.2
 
       - uses: ./.github/actions/collect-build-info
         id: info
