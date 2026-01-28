@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -22,6 +24,11 @@ jobs:
       - uses: ./.github/actions/dotnet-build
         with:
           build: "true"
+
+      - name: Attest Build Provenance
+        uses: actions/attest-build-provenance@96278af6caaf10aea03fd8d33a09a777ca52d62f
+        with:
+          subject-path: './build/*.zip'
 
       - uses: knope-dev/action@354f96399455dbd5bf44ad3ad08b5ebe7c9b0953 # v2.1.0
         with:
